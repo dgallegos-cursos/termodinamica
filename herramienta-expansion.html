@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expansión libre — Termodinámica</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hint { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin: 0 0 8px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 0 0 12px; }
+.box h3 { font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 6px; font-weight: 600; }
+.box p { margin: 0.3em 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 0 8px 8px 0; }
+.seg button { font: inherit; font-family: var(--sans); font-size: 0.85rem; background: var(--surface); color: var(--ink); border: 0; padding: 6px 10px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--blue); color: var(--surface); }
+.sl { display: grid; grid-template-columns: 1fr auto; gap: 0 10px; align-items: baseline; margin: 6px 0; font-family: var(--sans); font-size: 0.88rem; }
+.sl label { color: var(--muted); }
+.sl output { font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.sl input { grid-column: 1 / -1; width: 100%; margin: 2px 0 0; accent-color: var(--blue); }
+.vdw[hidden], #pview[hidden] { display: none; }
+.view { display: flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+.view .seg { margin: 0; }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+.acts button { font: inherit; font-family: var(--sans); font-size: 0.9rem; border-radius: 6px; padding: 7px 14px; cursor: pointer; }
+#bwall { background: var(--blue); color: var(--surface); border: 1px solid var(--blue); }
+#bwall:hover { background: var(--orange); border-color: var(--orange); }
+.ghost { background: var(--surface); color: var(--blue); border: 1px solid var(--line); }
+.ghost:hover { border-color: var(--blue); }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--sans); fill: var(--muted); }
+svg .ink { fill: var(--ink); }
+.gasfill { fill: var(--blue); fill-opacity: 0.22; transition: width 0.9s ease; }
+@media (prefers-reduced-motion: reduce) { .gasfill { transition: none; } }
+.zero { font-family: var(--sans); font-size: 0.95rem; text-align: center; margin: 4px 0 8px; }
+.zero b { color: var(--blue); }
+table.res td:last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.res td { padding: 5px 6px; }
+.f { font-style: italic; }
+.f .u { font-style: normal; }
+.frm { font-size: 0.92rem; overflow-x: auto; }
+ul.msgs { list-style: none; padding: 0; margin: 0; }
+ul.msgs li { border-left: 4px solid var(--blue); background: var(--blue-soft); border-radius: 4px; padding: 8px 12px; margin: 0 0 6px; font-size: 0.95rem; }
+ul.msgs li.warn { border-left-color: var(--orange); background: var(--orange-soft); }
+.leg { font-family: var(--sans); font-size: 0.8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 4px 0 0; }
+.leg span::before { content: ""; display: inline-block; width: 22px; height: 0; vertical-align: middle; margin-right: 6px; }
+.leg .lg::before { border-top: 2.5px solid var(--blue); }
+.leg .lr::before { border-top: 2.5px dotted var(--ink); }
+details { border-top: 1px solid var(--line); padding: 8px 0; }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; font-weight: 600; color: var(--blue); }
+summary small { font-weight: 400; color: var(--muted); font-family: var(--sans); }
+details p { margin: 8px 0 4px; }
+canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="brand" href="index.html">Termodinámica<span> ·</span> notas</a>
+<nav><a href="index.html">Inicio</a><a href="axiomas.html">Los axiomas</a><a href="index.html#clases">Clases</a><a href="index.html#herramientas">Herramientas</a><a href="parte-1.html">Resumen de la Parte I</a><a href="erratas.html">Fe de erratas</a></nav>
+</div></header>
+<main><div class="wrap">
+
+<p class="kicker">Herramienta interactiva · Clase 24</p>
+<h1>Expansión libre</h1>
+<p class="status">Esta herramienta ilustra las notas; no las sustituye.</p>
+<p class="lead">Un sistema hidrostático ocupa un volumen <span class="f">V<sub>1</sub></span> en un recipiente aislado; al otro lado de una pared aislante hay una cámara vacía de volumen <span class="f">V<sub>2</sub></span>. Al quitar la pared, el sistema pasa del estado <span class="f">(U<sub>i</sub>, V<sub>1</sub>, n)</span> al estado <span class="f">(U<sub>i</sub>, V<sub>1</sub> + V<sub>2</sub>, n)</span>. Elige el gas y los valores iniciales, y quita la pared.</p>
+
+<h2>El sistema</h2>
+<div class="box">
+<div class="seg" role="group" aria-label="Gas"><button id="g-id" aria-pressed="true">Gas ideal</button><button id="g-vdw" aria-pressed="false">Van der Waals</button></div>
+<div class="seg" role="group" aria-label="Capacidad calorífica molar"><button id="c-3" aria-pressed="true">Monoatómico, <i>c<sub>v</sub></i> = 3<i>R</i>/2</button><button id="c-5" aria-pressed="false">Diatómico, <i>c<sub>v</sub></i> = 5<i>R</i>/2</button></div>
+<div class="sl"><label for="s-n">Número de moles, <i>n</i></label><output id="o-n"></output><input type="range" id="s-n" min="0.1" max="5" step="0.1" value="1"></div>
+<div class="sl"><label for="s-T">Temperatura inicial, <i>T<sub>i</sub></i></label><output id="o-T"></output><input type="range" id="s-T" min="50" max="600" step="1" value="300"></div>
+<div class="sl"><label for="s-V1">Volumen del gas, <i>V</i><sub>1</sub></label><output id="o-V1"></output><input type="range" id="s-V1" min="0.5" max="10" step="0.1" value="1"></div>
+<div class="sl"><label for="s-V2">Volumen de la cámara vacía, <i>V</i><sub>2</sub></label><output id="o-V2"></output><input type="range" id="s-V2" min="0.1" max="20" step="0.1" value="1"></div>
+<div class="vdw" id="vdw" hidden>
+<div class="sl"><label for="s-a">Atracción, <i>a</i></label><output id="o-a"></output><input type="range" id="s-a" min="0" max="0.6" step="0.0005" value="0.1355"></div>
+<div class="sl"><label for="s-b">Volumen excluido, <i>b</i></label><output id="o-b"></output><input type="range" id="s-b" min="0" max="10" step="0.01" value="3.2"></div>
+</div>
+<div class="acts"><button id="bwall">Quitar la pared</button><button class="ghost" id="bar">Ejemplo: argón (Van der Waals)</button></div>
+<div class="view"><span>Ver:</span><div class="seg" role="group" aria-label="Ver"><button id="v-c" aria-pressed="true">Recipiente</button><button id="v-p" aria-pressed="false">Partículas</button></div></div>
+</div>
+
+<svg id="cont" viewBox="0 0 360 132" role="img" aria-label="Recipiente con el gas y la cámara vacía"></svg>
+<div id="pview" hidden><canvas id="cv" width="720" height="240" aria-label="Animación de partículas"></canvas>
+<p class="hint" style="margin-top:6px">Ilustración (mecánica estadística): la termodinámica no la necesita. La rapidez de los puntos crece con √<i>T</i>.</p></div>
+
+<div class="box" aria-live="polite">
+<h3>Lo que pasa</h3>
+<p class="zero"><b>Q</b> = 0, &nbsp;<b>W</b> = 0 &nbsp;⇒&nbsp; <b>ΔU</b> = 0 <span class="muted">(sistema compuesto aislado, Axioma 1(c))</span></p>
+<table class="res" id="res"></table>
+</div>
+
+<h2>El diagrama (<i>V</i>, <i>T</i>)</h2>
+<svg id="dia" viewBox="0 0 360 250" role="img" aria-label="Diagrama volumen-temperatura con la curva auxiliar y el proceso real"></svg>
+<div class="leg"><span class="lg">curva auxiliar <i>γ<sub>U</sub></i> (<i>U</i> = <i>U<sub>i</sub></i>)</span><span class="lr">proceso real (no es una curva del espacio termodinámico)</span></div>
+<p class="hint" style="margin-top:8px">La expansión libre no es cuasiestática: sólo sus estados inicial y final son estados de equilibrio. Como <i>S</i> y <i>T</i> son funciones de estado, sus cambios se calculan sobre <i>γ<sub>U</sub></i>, que une los mismos estados.</p>
+
+<h2>Las fórmulas</h2>
+<div class="box frm" id="frm"></div>
+<ul class="msgs" id="msgs" aria-live="polite"></ul>
+
+
+<div class="pager"><a href="clase-24.html">← Clase 24</a><a href="index.html#herramientas">Todas las herramientas</a><span></span></div>
+
+</div></main>
+<footer class="site"><div class="wrap">
+<p>Borrador, versión 2027-1 (12 de noviembre de 2026). © 2026 Domingo Gallegos. Notas y herramientas bajo licencia <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es">CC BY-NC-ND 4.0</a>: puedes compartirlas citando la fuente, sin fines comerciales y sin modificarlas.</p>
+<p>Las herramientas interactivas ilustran las notas; no las sustituyen. Este sitio no usa cookies ni seguimiento.</p>
+</div></footer>
+<script>
+(function () {
+  "use strict";
+  var R = 8.314; // J/(mol K)
+
+  // ---- Física (fórmulas de la Clase 24, c_v constante). Unidades SI. ----
+  // gas: "ideal" | "vdw"; n [mol]; Ti [K]; V1, V2 [m^3]; a [Pa m^6/mol^2]; b [m^3/mol]; cv [J/(mol K)]
+  function compute(o) {
+    var vdw = o.gas === "vdw";
+    var a = vdw ? o.a : 0, b = vdw ? o.b : 0, n = o.n, cv = o.cv, V1 = o.V1, Vf = o.V1 + o.V2;
+    var ui = cv * o.Ti - a * n / V1;                    // u_i = U_i/n
+    var Tof = function (V) { return (ui + a * n / V) / cv; }; // T a lo largo de γ_U
+    var p = function (T, V) { return n * R * T / (V - n * b) - a * n * n / (V * V); };
+    var pint = function (V) { return -a * n * n / (V * V); };
+    var Tf = Tof(Vf);
+    var dT = -(a * n / cv) * (1 / V1 - 1 / Vf);
+    var ok = V1 > n * b && Tf > 0;
+    var dSV = ok ? n * R * Math.log((Vf - n * b) / (V1 - n * b)) : NaN;
+    var dST = ok ? n * cv * Math.log(Tf / o.Ti) : NaN;
+    var dSb0 = ok ? n * R * Math.log(Vf / V1) + dST : NaN; // mismo a, con b = 0
+    // hipótesis de las notas sobre γ_U: p > 0 (y κ_T > 0, que el curso supone)
+    var pPos = ok, kPos = ok, N = 200;
+    for (var k = 0; ok && k <= N; k++) {
+      var V = V1 + (Vf - V1) * k / N, T = Tof(V);
+      if (!(p(T, V) > 0)) pPos = false;
+      var dpdV = -n * R * T / Math.pow(V - n * b, 2) + 2 * a * n * n / (V * V * V);
+      if (!(dpdV < 0)) kPos = false;
+    }
+    return { ok: ok, Ti: o.Ti, Tf: Tf, dT: dT, dS: dSV + dST, dSV: dSV, dST: dST, dSb0: dSb0,
+      pi: p(o.Ti, V1), pf: p(Tf, Vf), pinti: pint(V1), pintf: pint(Vf), pPos: pPos, kPos: kPos,
+      V1: V1, Vf: Vf, Tof: Tof, Tc: (a > 0 && b > 0) ? 8 * a / (27 * R * b) : null };
+  }
+  window.ExpLibre = { compute: compute, R: R };
+
+  // ---- Estado de la interfaz ----
+  var $ = function (id) { return document.getElementById(id); };
+  var st = { gas: "ideal", cvk: 3, open: false };
+  var SL = ["n", "T", "V1", "V2", "a", "b"];
+  function nf(x, d) { var s = x.toLocaleString("es-MX", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: false }); return /[1-9]/.test(s) ? s.replace("-", "−") : s.replace("-", ""); }
+  function sg(x, d) { var s = nf(Math.abs(x), d); return (x < 0 && s.replace(/[0,.]/g, "") !== "" ? "−" : (x > 0 && s.replace(/[0,.]/g, "") !== "" ? "+" : "")) + s; }
+  function inputs() {
+    return { gas: st.gas, n: +$("s-n").value, Ti: +$("s-T").value, V1: $("s-V1").value / 1000, V2: $("s-V2").value / 1000,
+      a: +$("s-a").value, b: $("s-b").value * 1e-5, cv: st.cvk * R / 2 };
+  }
+  function labels() {
+    $("o-n").textContent = nf(+$("s-n").value, 1) + " mol";
+    $("o-T").textContent = $("s-T").value + " K";
+    $("o-V1").textContent = nf(+$("s-V1").value, 1) + " L";
+    $("o-V2").textContent = nf(+$("s-V2").value, 1) + " L";
+    $("o-a").textContent = nf(+$("s-a").value, 4) + " Pa m⁶/mol²";
+    $("o-b").textContent = nf(+$("s-b").value, 2) + " × 10⁻⁵ m³/mol";
+  }
+
+  // ---- Recipiente ----
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function el(tag, at, txt) { var e = document.createElementNS(SVGNS, tag); for (var k in at) e.setAttribute(k, at[k]); if (txt != null) e.textContent = txt; return e; }
+  function drawCont(o) {
+    var s = $("cont"); s.innerHTML = "";
+    var x0 = 20, x1 = 340, y0 = 16, y1 = 84, W = x1 - x0, xw = x0 + W * o.V1 / o.Vf;
+    var d = el("defs", {}); var pt = el("pattern", { id: "hat", width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
+    pt.appendChild(el("line", { x1: 0, y1: 0, x2: 0, y2: 6, stroke: "#3b3b3b", "stroke-width": 2 })); d.appendChild(pt); s.appendChild(d);
+    s.appendChild(el("rect", { x: x0 - 6, y: y0 - 6, width: W + 12, height: y1 - y0 + 12, fill: "url(#hat)" }));
+    s.appendChild(el("rect", { x: x0, y: y0, width: W, height: y1 - y0, style: "fill: var(--surface)" }));
+    var g = el("rect", { x: x0, y: y0, width: (st.open ? W : xw - x0), height: y1 - y0, "class": "gasfill" }); s.appendChild(g);
+    if (!st.open) {
+      s.appendChild(el("rect", { x: xw - 2, y: y0, width: 4, height: y1 - y0, fill: "#3b3b3b" }));
+      s.appendChild(el("text", { x: (xw + x1) / 2, y: (y0 + y1) / 2 + 4, "text-anchor": "middle", "font-size": 12 }, "vacío"));
+      s.appendChild(el("text", { x: (x0 + xw) / 2, y: (y0 + y1) / 2 + 4, "text-anchor": "middle", "font-size": 12, "class": "ink" }, "gas"));
+    } else {
+      s.appendChild(el("text", { x: (x0 + x1) / 2, y: (y0 + y1) / 2 + 4, "text-anchor": "middle", "font-size": 12, "class": "ink" }, "gas"));
+    }
+    s.appendChild(el("text", { x: (x0 + xw) / 2, y: 106, "text-anchor": "middle", "font-size": 11 }, "V₁"));
+    s.appendChild(el("text", { x: (xw + x1) / 2, y: 106, "text-anchor": "middle", "font-size": 11 }, "V₂"));
+    s.appendChild(el("line", { x1: xw, y1: 94, x2: xw, y2: 110, stroke: "#a6a6a6", "stroke-width": 1 }));
+    s.appendChild(el("text", { x: x1, y: 128, "text-anchor": "end", "font-size": 10 }, st.open ? "pared removida" : "pared interna aislante"));
+  }
+
+  // ---- Diagrama (V, T) ----
+  function drawDia(r) {
+    var s = $("dia"); s.innerHTML = "";
+    var L = 52, Rr = 344, T0 = 14, B = 206;
+    var Vmax = r.Vf * 1.08 * 1000, Vmin = 0;
+    var span = Math.max(Math.abs(r.dT) * 1.5, 0.08 * r.Ti, 2);
+    var Thi = r.Ti + span * 0.45, Tlo = Math.min(r.Ti, r.Tf) - span * 0.45;
+    if (Math.abs(r.dT) < 1e-9) { Thi = r.Ti + span / 2; Tlo = r.Ti - span / 2; }
+    var X = function (V) { return L + (Rr - L) * (V * 1000 - Vmin) / (Vmax - Vmin); };
+    var Y = function (T) { return B - (B - T0) * (T - Tlo) / (Thi - Tlo); };
+    // ejes
+    s.appendChild(el("line", { x1: L, y1: B, x2: Rr, y2: B, stroke: "currentColor", style: "color: var(--muted)" }));
+    s.appendChild(el("line", { x1: L, y1: B, x2: L, y2: T0, stroke: "currentColor", style: "color: var(--muted)" }));
+    s.appendChild(el("text", { x: (L + Rr) / 2, y: 240, "text-anchor": "middle", "font-size": 12 }, "V (L)"));
+    s.appendChild(el("text", { x: 12, y: (T0 + B) / 2, "text-anchor": "middle", "font-size": 12, transform: "rotate(-90 12 " + (T0 + B) / 2 + ")" }, "T (K)"));
+    function ticks(lo, hi, nt) { var st0 = (hi - lo) / nt, p = Math.pow(10, Math.floor(Math.log10(st0))), m = st0 / p; var stp = (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p; var out = []; for (var v = Math.ceil(lo / stp) * stp; v <= hi + 1e-9; v += stp) out.push(+v.toFixed(10)); return { v: out, d: Math.max(0, -Math.floor(Math.log10(stp) + 1e-9)) }; }
+    var tv = ticks(Vmin, Vmax, 5); tv.v.forEach(function (v) { s.appendChild(el("line", { x1: X(v / 1000), y1: B, x2: X(v / 1000), y2: B + 4, stroke: "#a6a6a6" })); s.appendChild(el("text", { x: X(v / 1000), y: B + 16, "text-anchor": "middle", "font-size": 10 }, nf(v, tv.d))); });
+    var tt = ticks(Tlo, Thi, 4); tt.v.forEach(function (T) { s.appendChild(el("line", { x1: L - 4, y1: Y(T), x2: L, y2: Y(T), stroke: "#a6a6a6" })); s.appendChild(el("text", { x: L - 6, y: Y(T) + 3, "text-anchor": "end", "font-size": 10 }, nf(T, tt.d))); });
+    // guías finas grises en T_i y V
+    s.appendChild(el("line", { x1: L, y1: Y(r.Ti), x2: X(r.V1), y2: Y(r.Ti), stroke: "#a6a6a6", "stroke-width": 0.8 }));
+    s.appendChild(el("line", { x1: X(r.V1), y1: B, x2: X(r.V1), y2: Y(r.Ti), stroke: "#a6a6a6", "stroke-width": 0.8 }));
+    if (st.open) {
+      s.appendChild(el("line", { x1: X(r.Vf), y1: B, x2: X(r.Vf), y2: Y(r.Tf), stroke: "#a6a6a6", "stroke-width": 0.8 }));
+      var d = "", N = 60;
+      for (var k = 0; k <= N; k++) { var V = r.V1 + (r.Vf - r.V1) * k / N; d += (k ? "L" : "M") + X(V).toFixed(2) + " " + Y(r.Tof(V)).toFixed(2); }
+      s.appendChild(el("path", { d: d, fill: "none", stroke: "currentColor", "stroke-width": 2.5, style: "color: var(--blue)" }));
+      // proceso real: salto punteado (desplazado en arco para no taparse con γ_U)
+      var xa = X(r.V1), ya = Y(r.Ti), xb = X(r.Vf), yb = Y(r.Tf), mx = (xa + xb) / 2, my = Math.min(ya, yb) - 34;
+      s.appendChild(el("path", { d: "M" + xa + " " + ya + " Q" + mx + " " + my + " " + xb + " " + yb, fill: "none", stroke: "currentColor", "stroke-width": 2, "stroke-dasharray": "1.5 4", "stroke-linecap": "round", style: "color: var(--ink)" }));
+      s.appendChild(el("circle", { cx: xb, cy: yb, r: 4.5, style: "fill: var(--blue)" }));
+      s.appendChild(el("text", { x: Math.min(xb + 6, Rr - 14), y: yb + (r.dT < 0 ? 16 : -8), "font-size": 12, "class": "ink" }, "Θ_f"));
+    }
+    s.appendChild(el("circle", { cx: X(r.V1), cy: Y(r.Ti), r: 4.5, style: "fill: var(--blue)" }));
+    s.appendChild(el("text", { x: X(r.V1) - 4, y: Y(r.Ti) - 9, "text-anchor": "end", "font-size": 12, "class": "ink" }, "Θ_i"));
+    // subíndices en SVG
+    Array.prototype.forEach.call(s.querySelectorAll("text"), function (t) { if (/Θ_/.test(t.textContent)) { var p = t.textContent.split("_"); t.textContent = p[0]; t.appendChild(el("tspan", { "font-size": 9, dy: 3 }, p[1])); } });
+  }
+
+  // ---- Resultados, fórmulas y mensajes ----
+  function render() {
+    labels();
+    var o = inputs(), r = compute(o), vdw = st.gas === "vdw";
+    // sin resultado: no hay estado final, estados inestables en γ_U, o p < 0 con ΔS ≤ 0 (Axioma 3)
+    var blocked = !r.ok || !r.kPos || (!r.pPos && !(r.dS > 0));
+    $("vdw").hidden = !vdw;
+    drawCont(r);
+    if (!blocked) drawDia(r); else $("dia").innerHTML = "";
+    var rows = [];
+    var kPa = function (x) { return nf(x / 1000, 1) + " kPa"; };
+    if (blocked) {
+      rows.push(["<span class=\"muted\">Con estos valores no hay resultado: ver el aviso abajo.</span>", ""]);
+    } else if (!st.open) {
+      rows.push(["Estado inicial", "<i>T<sub>i</sub></i> = " + nf(r.Ti, 1) + " K"]);
+      rows.push(["Presión inicial, <i>p<sub>i</sub></i>", r.ok ? kPa(r.pi) : "—"]);
+      rows.push(["Presión de interacción, <i>p</i><sub>int</sub>", kPa(vdw ? r.pinti : 0)]);
+      rows.push(["<span class=\"muted\">Quita la pared para ver el estado final.</span>", ""]);
+    } else {
+      rows.push(["Temperatura final, <i>T<sub>f</sub></i>", nf(r.Tf, 2) + " K"]);
+      rows.push(["<i>ΔT</i>", sg(r.dT, 2) + " K"]);
+      rows.push(["<i>ΔS</i>", sg(r.dS, 2) + " J/K"]);
+      if (vdw) {
+        rows.push(["&nbsp;&nbsp;<span class=\"muted\">de <i>T</i>: <i>n c<sub>v</sub></i> ln(<i>T<sub>f</sub></i>/<i>T<sub>i</sub></i>)</span>", sg(r.dST, 2) + " J/K"]);
+        rows.push(["&nbsp;&nbsp;<span class=\"muted\">de <i>V</i>: <i>nR</i> ln[(<i>V</i><sub>1</sub> + <i>V</i><sub>2</sub> − <i>nb</i>)/(<i>V</i><sub>1</sub> − <i>nb</i>)]</span>", sg(r.dSV, 2) + " J/K"]);
+      }
+      rows.push(["Presión: inicial → final", kPa(r.pi) + " → " + kPa(r.pf)]);
+      rows.push([(vdw ? "<i>p</i><sub>int</sub> = −<i>a n</i>²/<i>V</i>²: inicial → final" : "Presión de interacción, <i>p</i><sub>int</sub>"), vdw ? kPa(r.pinti) + " → " + kPa(r.pintf) : kPa(0)]);
+    }
+    $("res").innerHTML = rows.map(function (x) { return "<tr><td>" + x[0] + "</td><td>" + x[1] + "</td></tr>"; }).join("");
+
+    var F;
+    if (!vdw) {
+      F = "<p><b>Gas ideal</b>, <span class=\"f\">pV = nRT</span>, <span class=\"f\">U = n c<sub>v</sub> T</span>:</p>" +
+        "<p><span class=\"f\">p</span><sub>int</sub> = 0, &nbsp; <span class=\"f\">ΔT</span> = 0, &nbsp; <span class=\"f\">ΔS = nR</span> ln[(<span class=\"f\">V</span><sub>1</sub> + <span class=\"f\">V</span><sub>2</sub>)/<span class=\"f\">V</span><sub>1</sub>].</p>";
+    } else {
+      F = "<p><b>Van der Waals</b>, <span class=\"f\">p = nRT/(V − nb) − a n</span>²/<span class=\"f\">V</span>², &nbsp;<span class=\"f\">U = n c<sub>v</sub> T − a n</span>²/<span class=\"f\">V</span>:</p>" +
+        "<p><span class=\"f\">p</span><sub>int</sub> = −<span class=\"f\">a n</span>²/<span class=\"f\">V</span>²,</p>" +
+        "<p><span class=\"f\">ΔT</span> = −(<span class=\"f\">a n</span>/<span class=\"f\">c<sub>v</sub></span>)[1/<span class=\"f\">V</span><sub>1</sub> − 1/(<span class=\"f\">V</span><sub>1</sub> + <span class=\"f\">V</span><sub>2</sub>)],</p>" +
+        "<p><span class=\"f\">ΔS = n c<sub>v</sub></span> ln(<span class=\"f\">T<sub>f</sub></span>/<span class=\"f\">T<sub>i</sub></span>) + <span class=\"f\">nR</span> ln[(<span class=\"f\">V</span><sub>1</sub> + <span class=\"f\">V</span><sub>2</sub> − <span class=\"f\">nb</span>)/(<span class=\"f\">V</span><sub>1</sub> − <span class=\"f\">nb</span>)].</p>";
+    }
+    F += "<p class=\"muted\" style=\"font-size:0.88rem\"><span class=\"f\">c<sub>v</sub></span> es la capacidad calorífica molar, constante; <span class=\"f\">C<sub>V</sub> = n c<sub>v</sub></span>.</p>";
+    $("frm").innerHTML = F;
+
+    var M = [];
+    if (!r.ok) {
+      if (!(o.V1 > o.n * (vdw ? o.b : 0))) M.push(["warn", "Con estos valores <span class=\"f\">V</span><sub>1</sub> ≤ <span class=\"f\">nb</span>: el gas no cabe en <span class=\"f\">V</span><sub>1</sub>. Aumenta <span class=\"f\">V</span><sub>1</sub> o reduce <span class=\"f\">n</span> o <span class=\"f\">b</span>."]);
+      else M.push(["warn", "Con estos valores la ecuación calórica da <span class=\"f\">T<sub>f</sub></span> ≤ 0: no hay un estado final de equilibrio. Aumenta <span class=\"f\">T<sub>i</sub></span> o reduce <span class=\"f\">a</span>."]);
+    } else if (!r.kPos) {
+      M.push(["warn", "Con estos valores, algunos estados de <span class=\"f\">γ<sub>U</sub></span> tienen <span class=\"f\">κ<sub>T</sub></span> ≤ 0: son estados inestables y la expansión libre no puede llegar a ellos. Cambia los valores."]);
+    } else if (blocked) {
+      M.push(["warn", "Con estos valores, <span class=\"f\">p</span> &lt; 0 en algunos estados de <span class=\"f\">γ<sub>U</sub></span> y el cálculo da <span class=\"f\">ΔS</span> ≤ 0. Por el Axioma 3, la expansión libre no puede llegar a este estado: el estado final real es otro."]);
+    } else {
+      if (st.open && !r.pPos) M.push(["warn", "Con estos valores, <span class=\"f\">p</span> &lt; 0 en algunos estados de <span class=\"f\">γ<sub>U</sub></span>. Las notas suponen <span class=\"f\">p</span> &gt; 0; aquí el resultado sigue valiendo, pero el argumento de la Clase 24 ya no garantiza <span class=\"f\">ΔS</span> &gt; 0."]);
+      if (st.open && r.Tc && r.Tf < r.Tc) M.push(["warn", "Con estos valores, <span class=\"f\">T<sub>f</sub></span> = " + nf(r.Tf, 1) + " K está por debajo de la temperatura crítica <span class=\"f\">T<sub>c</sub></span> = 8<span class=\"f\">a</span>/(27<span class=\"f\">Rb</span>) = " + nf(r.Tc, 1) + " K. Por debajo de <span class=\"f\">T<sub>c</sub></span>, el gas de Van der Waals puede separarse en dos fases, líquido y vapor (Clases 33 y 34); si eso ocurre, el estado final no es el estado homogéneo que se muestra aquí."]);
+      if (st.open) {
+        if (!vdw || o.a === 0) M.push(["", "<span class=\"f\">p</span><sub>int</sub> = 0: la energía no depende del volumen y la temperatura no cambia, <span class=\"f\">ΔT</span> = 0."]);
+        else M.push(["", "<span class=\"f\">p</span><sub>int</sub> &lt; 0: domina la atracción y el gas se enfría, <span class=\"f\">ΔT</span> = " + sg(r.dT, 2) + " K."]);
+        var r0 = compute({ gas: o.gas, n: o.n, Ti: o.Ti, V1: o.V1, V2: o.V2, a: o.a, b: 0, cv: o.cv });
+        var b0ok = r0.ok && r0.pPos && r0.kPos; // comparación con b = 0 sólo si ese caso también cumple las hipótesis
+        if (vdw) M.push(["", "El volumen excluido <span class=\"f\">b</span> forma parte de la presión térmica: cambia <span class=\"f\">ΔS</span> pero no <span class=\"f\">ΔT</span>." + (b0ok ? " Con <span class=\"f\">b</span> = 0 y la misma <span class=\"f\">a</span> serían <span class=\"f\">ΔT</span> = " + sg(r.dT, 2) + " K y <span class=\"f\">ΔS</span> = " + sg(r.dSb0, 2) + " J/K." : "")]);
+        if (r.dS > 0) M.push(["", "<span class=\"f\">ΔS</span> &gt; 0 sin calor: por el Axioma 3, la expansión libre es irreversible; el estado inicial no es adiabáticamente accesible desde el estado final."]);
+      }
+    }
+    $("msgs").innerHTML = M.map(function (m) { return "<li class=\"" + m[0] + "\">" + m[1] + "</li>"; }).join("");
+    part.target(r);
+  }
+
+  // ---- Partículas (ilustración) ----
+  var part = (function () {
+    var cv = $("cv"), ctx = cv.getContext("2d"), P = [], running = false, frac = 0.5, wallOpen = false, speed = 1, lastT = 0;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var Wd = cv.width, Ht = cv.height, M = 10;
+    function seed() { P = []; for (var i = 0; i < 80; i++) { var th = Math.random() * 2 * Math.PI; P.push({ x: M + Math.random() * (frac * (Wd - 2 * M) - 4), y: M + Math.random() * (Ht - 2 * M), vx: Math.cos(th), vy: Math.sin(th) }); } }
+    function col(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#1f4e9e"; }
+    function draw() {
+      ctx.clearRect(0, 0, Wd, Ht);
+      ctx.fillStyle = col("--surface"); ctx.fillRect(0, 0, Wd, Ht);
+      ctx.strokeStyle = "#3b3b3b"; ctx.lineWidth = 6; ctx.strokeRect(3, 3, Wd - 6, Ht - 6);
+      var xw = M + frac * (Wd - 2 * M);
+      if (!wallOpen) { ctx.fillStyle = "#3b3b3b"; ctx.fillRect(xw - 3, 0, 6, Ht); }
+      ctx.fillStyle = col("--blue");
+      P.forEach(function (p) { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, 2 * Math.PI); ctx.fill(); });
+    }
+    function step(t) {
+      if (!running) return;
+      var dt = Math.min(40, t - (lastT || t)); lastT = t;
+      var xw = M + frac * (Wd - 2 * M), xmax = wallOpen ? Wd - M : xw - 6;
+      P.forEach(function (p) {
+        p.x += p.vx * speed * dt * 0.12; p.y += p.vy * speed * dt * 0.12;
+        if (p.x < M) { p.x = M; p.vx = Math.abs(p.vx); }
+        if (p.x > xmax) { p.x = xmax; p.vx = -Math.abs(p.vx); }
+        if (p.y < M) { p.y = M; p.vy = Math.abs(p.vy); }
+        if (p.y > Ht - M) { p.y = Ht - M; p.vy = -Math.abs(p.vy); }
+      });
+      draw(); requestAnimationFrame(step);
+    }
+    return {
+      show: function (on) {
+        running = on && !reduce;
+        if (on) { draw(); if (running) { lastT = 0; requestAnimationFrame(step); } }
+      },
+      target: function (r) {
+        var f = r.V1 / r.Vf;
+        if (Math.abs(f - frac) > 1e-6 || wallOpen !== st.open) { if (!st.open || !wallOpen) { frac = f; if (!st.open) seed(); } }
+        wallOpen = st.open;
+        speed = r.ok ? Math.sqrt((st.open ? r.Tf : r.Ti) / 300) : 1;
+        if (!P.length) seed();
+        if (reduce && wallOpen) P.forEach(function (p) { p.x = M + Math.random() * (Wd - 2 * M); });
+        draw();
+      }
+    };
+  })();
+
+  // ---- Eventos ----
+  function press(a, b, on) { $(a).setAttribute("aria-pressed", on); $(b).setAttribute("aria-pressed", !on); }
+  $("g-id").onclick = function () { st.gas = "ideal"; press("g-id", "g-vdw", true); render(); };
+  $("g-vdw").onclick = function () { st.gas = "vdw"; press("g-id", "g-vdw", false); render(); };
+  $("c-3").onclick = function () { st.cvk = 3; press("c-3", "c-5", true); render(); };
+  $("c-5").onclick = function () { st.cvk = 5; press("c-3", "c-5", false); render(); };
+  SL.forEach(function (k) { $("s-" + k).addEventListener("input", render); });
+  $("bwall").onclick = function () { st.open = !st.open; this.textContent = st.open ? "Volver al estado inicial" : "Quitar la pared"; render(); };
+  function view(p) { press("v-c", "v-p", !p); $("cont").style.display = p ? "none" : ""; $("pview").hidden = !p; part.show(p); }
+  $("v-c").onclick = function () { view(false); };
+  $("v-p").onclick = function () { view(true); };
+  $("bar").onclick = function () {
+    st.gas = "vdw"; press("g-id", "g-vdw", false); st.cvk = 3; press("c-3", "c-5", true);
+    var v = { n: 1, T: 300, V1: 1, V2: 1, a: 0.1355, b: 3.2 }; SL.forEach(function (k) { $("s-" + k).value = v[k]; });
+    render();
+  };
+  window.ExpLibre.setOpen = function (b) { if (st.open !== b) $("bwall").click(); };
+  render();
+})();
+</script>
+</body>
+</html>
