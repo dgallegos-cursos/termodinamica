@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diccionario con Callen — Termodinámica</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hint { font-family: var(--sans); font-size: 0.85rem; color: var(--muted); margin: 0 0 8px; }
+.pbtns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0 12px; }
+.pbtn { font: inherit; font-family: var(--sans); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 4px 6px; cursor: pointer; text-align: center; line-height: 1.2; }
+.pbtn b { display: block; font-family: var(--serif); font-size: 1.25rem; color: var(--blue); }
+.pbtn span { display: block; font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.pbtn[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); }
+.pbtn[aria-pressed="true"] b, .pbtn[aria-pressed="true"] span { color: var(--surface); }
+.pbtn:focus-visible, .ax button:focus-visible, summary:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 0 0 12px; }
+.box h3 { font-family: var(--sans); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 4px; font-weight: 600; }
+.box p { margin: 0.3em 0; }
+.box.diff { border-left: 4px solid var(--orange); }
+ul.axl { list-style: none; padding: 0; margin: 0 0 8px; }
+.ax { border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 6px; padding: 8px 12px; margin: 0 0 6px; background: var(--surface); transition: background .15s, border-color .15s; }
+.ax .lab { font-family: var(--sans); font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+.ax p { margin: 2px 0 0; font-size: 0.95rem; }
+.ax.on { background: var(--blue-soft); border-color: var(--blue); }
+.ax.on .lab { color: var(--blue); }
+.ax.nc .lab::after { content: "Callen no la postula"; font-weight: 400; font-size: 0.7rem; border: 1px solid var(--orange); color: var(--orange); border-radius: 999px; padding: 0 7px; margin-left: 8px; white-space: nowrap; }
+.ax.nc.sel { background: var(--orange-soft); border-color: var(--orange); }
+.ax button { font: inherit; font-family: var(--sans); font-size: 0.8rem; background: none; border: 0; padding: 4px 0 0; color: var(--orange); cursor: pointer; text-decoration: underline; }
+.ax.extra { border-style: dashed; border-left-style: solid; }
+.f { font-style: italic; }
+.f .u { font-style: normal; }
+.cm { display: block; font-size: 0.88rem; color: var(--muted); }
+table.dic td:first-child { font-weight: 600; }
+@media (max-width: 600px) {
+  table.dic, table.dic tbody, table.dic tr, table.dic td { display: block; width: 100%; }
+  table.dic tr.hd { display: none; }
+  table.dic tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+  table.dic td { border: 0; padding: 2px 0; }
+  table.dic td::before { content: attr(data-l) ": "; font-family: var(--sans); font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+}
+details { border-top: 1px solid var(--line); padding: 8px 0; }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+summary { cursor: pointer; font-weight: 600; color: var(--blue); }
+details p { margin: 8px 0 4px; }
+details table.dic { margin: 4px 0 8px; }
+.ref { font-size: 0.88rem; }
+.box p.cont { font-family: var(--sans); font-size: 0.85rem; color: var(--blue); font-weight: 600; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+<a class="brand" href="index.html">Termodinámica<span> ·</span> notas</a>
+<nav><a href="index.html">Inicio</a><a href="index.html#clases">Clases</a><a href="index.html#herramientas">Herramientas</a><a href="parte-1.html">Resumen de la Parte I</a><a href="erratas.html">Fe de erratas</a></nav>
+</div></header>
+<main><div class="wrap">
+
+<p class="kicker">Herramienta interactiva · Clase 23</p>
+<h1>Los postulados de Callen y los axiomas de la Clase 23</h1>
+<p class="status">Esta herramienta ilustra las notas; no las sustituye.</p>
+<p class="lead">La formulación axiomática más usada en los libros de texto es la de H. B. Callen, quien siguió las ideas de L. Tisza para dar una forma compacta al programa de Gibbs. El contenido es el mismo que el de los Axiomas 1–4 de la <a href="clase-23.html">Clase 23</a>; lo que cambia es el empaquetado.</p>
+
+<h2>Postulados y axiomas</h2>
+<p>Callen trabaja con <i>sistemas simples</i> (§1.3): homogéneos, isótropos y sin carga, suficientemente grandes para despreciar los efectos de superficie y sobre los que no actúan campos eléctricos, magnéticos ni gravitacionales. Estos sistemas son nuestros sistemas hidrostáticos.</p>
+<p class="hint">Toca un postulado para ver qué axiomas de la Clase 23 le corresponden.</p>
+<div class="pbtns" id="pbtns">
+<button class="pbtn" data-p="I" aria-pressed="false"><b>I</b><span>estados de equilibrio</span></button>
+<button class="pbtn" data-p="II" aria-pressed="false"><b>II</b><span>máxima entropía</span></button>
+<button class="pbtn" data-p="III" aria-pressed="false"><b>III</b><span>aditividad</span></button>
+<button class="pbtn" data-p="IV" aria-pressed="false"><b>IV</b><span>S en T = 0</span></button>
+</div>
+<div class="box" id="pcard" aria-live="polite"><h3 id="ptitle"></h3><div id="ptext"></div></div>
+<div class="box diff" aria-live="polite"><h3>Diferencia</h3><p id="dtext"></p></div>
+<p class="hint">Axiomas de la Clase 23</p>
+<ul class="axl" id="axl"></ul>
+
+<h2>Para leer más</h2>
+<details><summary>Dos caminos en espejo</summary>
+<p>Las dos formulaciones son imágenes en espejo. En la Clase 23 postulamos un principio sobre procesos (Axioma 3) y la unicidad del estado final (Axioma 1(b)), y <i>demostramos</i> el principio de máxima entropía. Callen postula el principio de máxima entropía y <i>deduce</i> los resultados sobre procesos, como el teorema del trabajo máximo y la eficiencia de Carnot (capítulo 4); para ello describe cada proceso como un cambio de restricciones en un sistema compuesto aislado que incluye fuentes reversibles de trabajo y de calor. Cada camino tiene un paso de conexión, en direcciones opuestas.</p>
+</details>
+<details><summary>La unicidad y el pistón adiabático</summary>
+<p>La unicidad del estado final no es una hipótesis adicional nuestra: está implícita en el postulado II de Callen, que supone que los valores finales de los parámetros extensivos están bien definidos. En la Clase 23 simplemente la enunciamos, y el pistón adiabático —una pared interna adiabática, móvil e impermeable— muestra por qué vale la pena hacerlo: la mecánica da <span class="f">p<sub>1</sub> = p<sub>2</sub></span>, pero ninguna condición iguala las temperaturas, y el estado final depende de la disipación en el pistón. Callen llega a la misma conclusión: al final de §2.7 (p. 51) dice que una pared adiabática y móvil presenta un problema «con sutilezas», y en el Problema 2.7-3 (pp. 53–54) lo llama un problema <i>indeterminado</i>: el estado final depende de la viscosidad de los fluidos, y el formalismo de máxima entropía determina las presiones pero no las temperaturas. Es la ecuación faltante de la Clase 23.</p>
+</details>
+<details><summary>Otras formulaciones</summary>
+<p>Los postulados de Callen no son la única formulación axiomática de la termodinámica. C. Carathéodory (1909) construyó la entropía a partir de la inaccesibilidad adiabática; es el principio de Carathéodory de la Parte I. R. Giles (<i>Mathematical Foundations of Thermodynamics</i>, 1964) la construyó a partir de una relación de orden entre estados. La formulación más reciente y rigurosa es la de E. H. Lieb y J. Yngvason (<i>Physics Reports</i> <b>310</b>, 1–96, 1999), quienes, en lugar de postular la entropía, la <i>construyen</i> a partir de axiomas sobre la relación de accesibilidad adiabática; su punto de partida está más cerca del camino de la Parte I que del de la Clase 23.</p>
+</details>
+<details><summary>La notación de Callen</summary>
+<p>Callen usa una notación y una convención de signos distintas para algunas cantidades; esta tabla las relaciona.</p>
+<table class="dic">
+<tr class="hd"><th>Estas notas</th><th>Callen</th><th>Comentario</th></tr>
+<tr><td data-l="Estas notas">sistema hidrostático</td><td data-l="Callen"><i>simple system</i></td><td data-l="Comentario">Definición de §1.3.</td></tr>
+<tr><td data-l="Estas notas">sistema compuesto <b>aislado</b></td><td data-l="Callen"><i>closed composite system</i></td><td data-l="Comentario">Para Callen «cerrado» significa que no cambian U, V ni los números de moles totales: nuestro «aislado».</td></tr>
+<tr><td data-l="Estas notas">número de moles, <span class="f">n</span></td><td data-l="Callen"><i>mole numbers</i>, <span class="f">N<sub>1</sub>, …, N<sub>r</sub></span></td><td data-l="Comentario">La <span class="f">N</span> de Callen cuenta moles, no partículas.</td></tr>
+<tr><td data-l="Estas notas"><span class="f">p</span></td><td data-l="Callen"><span class="f">P</span></td><td data-l="Comentario">Presión.</td></tr>
+<tr><td data-l="Estas notas"><span class="f">β = (1/V)(∂V/∂T)<sub>p,n</sub></span></td><td data-l="Callen"><span class="f">α = (1/V)(∂V/∂T)<sub>P,N</sub></span></td><td data-l="Comentario">Coeficiente de expansión térmica.</td></tr>
+<tr><td data-l="Estas notas"><span class="f">W</span>: trabajo <b>realizado por</b> el sistema, <span class="f">ΔU = Q − W</span></td><td data-l="Callen">—</td><td data-l="Comentario">Convención de la Parte I.</td></tr>
+<tr><td data-l="Estas notas"><span class="f">W<sub>rec</sub> := −W</span>: trabajo <b>recibido</b>, <span class="f">ΔU = Q + W<sub>rec</sub></span></td><td data-l="Callen"><span class="f">W</span>, con <span class="f">dU = đQ + đW<sub>M</sub> + đW<sub>c</sub></span></td><td data-l="Comentario">Los términos de trabajo de Callen son trabajo recibido: <span class="f">đW<sub>M</sub> = −P dV</span> (mecánico, §1.8) y <span class="f">đW<sub>c</sub> = Σ<sub>k</sub> μ<sub>k</sub> dN<sub>k</sub></span> (químico, §2.1).</td></tr>
+<tr><td data-l="Estas notas"><span class="f">δQ = T dS</span></td><td data-l="Callen"><span class="f">đQ = T dS</span></td><td data-l="Comentario">Calor cuasiestático (§2.1).</td></tr>
+<tr><td data-l="Estas notas"><span class="f">T dS = dU + p dV − μ dn</span></td><td data-l="Callen"><span class="f">dU = T dS − P dV + μ dN</span></td><td data-l="Comentario">Relación fundamental: la misma ecuación.</td></tr>
+<tr><td data-l="Estas notas"><span class="f">W<sub>γ</sub> = ∫<sub>γ</sub> (p dV − μ dn)</span></td><td data-l="Callen"><span class="f">đW<sub>M</sub> + đW<sub>c</sub> = −P dV + μ dN</span></td><td data-l="Comentario">Trabajo reversible: realizado por el sistema en estas notas, recibido en Callen.</td></tr>
+<tr><td data-l="Estas notas">estados de equilibrio restringidos, <span class="f">𝓡(Θ<sub>i</sub>)</span></td><td data-l="Callen"><i>constrained equilibrium states</i></td><td data-l="Comentario">§1.10.</td></tr>
+<tr><td data-l="Estas notas">condiciones de equilibrio <span class="f">T<sub>1</sub> = T<sub>2</sub></span>, <span class="f">p<sub>1</sub> = p<sub>2</sub></span>, <span class="f">μ<sub>1</sub> = μ<sub>2</sub></span></td><td data-l="Callen">las mismas</td><td data-l="Comentario">Callen las obtiene en §§2.4–2.8 anulando las derivadas de S respecto a los parámetros libres, como en la Clase 23.</td></tr>
+</table>
+<p><b>Cuidado con el signo del trabajo.</b> En la Parte I el trabajo reversible es <span class="f">W<sub>γ</sub> = ∫<sub>γ</sub> (p dV − μ dn)</span>, realizado <i>por</i> el sistema, mientras que en Callen <span class="f">−P dV + μ dN</span> es trabajo <i>recibido</i>. Las dos escrituras de la relación fundamental, <span class="f">T dS = dU + p dV − μ dn</span> y <span class="f">dU = T dS − P dV + μ dN</span>, son la misma ecuación.</p>
+</details>
+
+<p class="muted ref">Los postulados se citan parafraseados, con la terminología de estas notas, de H. B. Callen, <i>Thermodynamics and an Introduction to Thermostatistics</i>, 2a. ed. (Wiley, 1985), §1.10.</p>
+<div class="pager"><a href="clase-23.html">← Clase 23</a><a href="index.html#herramientas">Todas las herramientas</a><span></span></div>
+
+</div></main>
+<footer class="site"><div class="wrap">
+<p>Borrador, versión 2027-1 (12 de noviembre de 2026). © 2026 Domingo Gallegos. Notas y herramientas bajo licencia <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es">CC BY-NC-ND 4.0</a>: puedes compartirlas citando la fuente, sin fines comerciales y sin modificarlas.</p>
+<p>Las herramientas interactivas ilustran las notas; no las sustituyen. Este sitio no usa cookies ni seguimiento.</p>
+</div></footer>
+<script>
+(function () {
+  "use strict";
+  // Axiomas de la Clase 23 (enunciados de una línea tomados de Clase-23.pdf).
+  var AX = [
+    ["1a", "Axioma 1(a)", "Los estados de equilibrio de un sistema hidrostático están completamente caracterizados por su energía interna <span class=\"f\">U</span>, su volumen <span class=\"f\">V</span> y su número de moles <span class=\"f\">n</span>."],
+    ["1b", "Axioma 1(b)", "Un sistema aislado, compuesto de uno o más sistemas hidrostáticos, evoluciona hasta un único estado de equilibrio, determinado por sus cantidades conservadas y por sus restricciones internas."],
+    ["1c", "Axioma 1(c)", "La energía de un sistema aislado se conserva; para cualquier proceso, <span class=\"f\">ΔU = Q − W</span>."],
+    ["2a", "Axioma 2(a)", "Todo sistema hidrostático tiene una entropía <span class=\"f\">S(U, V, n)</span>, continua, diferenciable y estrictamente creciente en la energía: <span class=\"f\">(∂S/∂U)<sub>V,n</sub> = 1/T &gt; 0</span>."],
+    ["2b", "Axioma 2(b)", "La entropía de un sistema compuesto es la suma de las entropías de sus subsistemas."],
+    ["2c", "Axioma 2(c)", "En un proceso reversible <span class=\"f\">δQ = T dS</span>, de modo que entre estados de equilibrio se cumple la relación fundamental <span class=\"f\">dS = dU/T + (p/T) dV − (μ/T) dn</span>."],
+    ["3", "Axioma 3", "Si <span class=\"f\">Θ<sub>2</sub></span> es adiabáticamente accesible desde <span class=\"f\">Θ<sub>1</sub></span>, entonces <span class=\"f\">S(Θ<sub>2</sub>) ≥ S(Θ<sub>1</sub>)</span>, con la igualdad si y sólo si <span class=\"f\">Θ<sub>1</sub></span> también es adiabáticamente accesible desde <span class=\"f\">Θ<sub>2</sub></span>."],
+    ["4", "Axioma 4", "Cerca del cero absoluto la entropía se vuelve independiente del volumen; <span class=\"f\">S<sub>0</sub></span> es el mismo para todos los estados de equilibrio con la misma composición química."],
+    ["planck", "Convención de Planck", "Se puede tomar el enunciado de Planck y elegir <span class=\"f\">S<sub>0</sub> = 0</span> (una convención compatible con el Axioma 4)."]
+  ];
+  // Postulados de Callen (§1.10, parafraseados) y su correspondencia con los axiomas.
+  var P = {
+    I: { t: "Postulado I", ax: ["1a"], c: "Lo contiene el Axioma 1(a).",
+      s: "Existen estados de equilibrio de los sistemas hidrostáticos, completamente caracterizados por la energía interna <span class=\"f\">U</span>, el volumen <span class=\"f\">V</span> y los números de moles de sus componentes químicos.",
+      d: "Ninguna." },
+    II: { t: "Postulado II", ax: ["1b", "2b", "3"], c: "Lo contienen los Axiomas 1(b), 2(b) y 3.",
+      s: "Existe una función de los parámetros extensivos, la entropía <span class=\"f\">S</span>, definida para los estados de equilibrio de cualquier sistema compuesto, tal que al remover una restricción interna los parámetros extensivos toman los valores que maximizan la entropía sobre el conjunto de estados de equilibrio restringidos.</p><p class=\"muted\">Este postulado es nuestro principio de máxima entropía; el conjunto de estados de equilibrio restringidos de Callen es nuestro <span class=\"f\">𝓡(Θ<sub>i</sub>)</span>.",
+      d: "En Callen el principio de máxima entropía es un postulado; en la Clase 23 es un teorema. Para demostrarlo usamos el principio de entropía (Axioma 3), que habla de accesibilidad adiabática, la aditividad de la entropía (Axioma 2(b)) y un axioma que Callen no enuncia explícitamente: la unicidad del estado final (Axioma 1(b))." },
+    III: { t: "Postulado III", ax: ["2a", "2b"], c: "Lo contienen los Axiomas 2(a) y 2(b).",
+      s: "La entropía de un sistema compuesto es aditiva sobre sus subsistemas, y es continua, diferenciable y monótonamente creciente en la energía.",
+      d: "Ninguna. Callen también deduce la extensividad de la aditividad (§1.10). Su postulado III implica, como nuestro Axioma 2(a), que la temperatura no es negativa (Callen dice «no negativa»; nosotros pedimos <span class=\"f\">T &gt; 0</span>); en una nota al pie menciona las temperaturas negativas de los sistemas de espines." },
+    IV: { t: "Postulado IV", ax: ["4", "planck"], c: "Lo contienen el Axioma 4 y la convención de Planck.",
+      s: "La entropía de cualquier sistema se anula en el estado en el que <span class=\"f\">(∂U/∂S)<sub>V,n</sub> = 0</span>, es decir, en el cero de temperatura.",
+      d: "El postulado IV es el enunciado de Planck: contiene al teorema de Nernst y además la convención <span class=\"f\">S<sub>0</sub> = 0</span> (Callen lo discute en el capítulo 11)." }
+  };
+  // Axiomas que Callen no postula.
+  var NC = {
+    "1c": "Callen no la postula: introduce la conservación de la energía y la primera ley antes de los postulados (§§1.7–1.8).",
+    "2c": "Callen no la postula: identifica <span class=\"f\">T dS</span> con el calor cuasiestático una vez que tiene la relación fundamental (§2.1)."
+  };
+  var state = { p: "I", nc: null };
+  var axl = document.getElementById("axl");
+  AX.forEach(function (a) {
+    var li = document.createElement("li");
+    li.className = "ax" + (NC[a[0]] ? " nc" : "") + (a[0] === "planck" ? " extra" : "");
+    li.id = "ax-" + a[0];
+    li.innerHTML = '<span class="lab">' + a[1] + "</span><p>" + a[2] + "</p>" +
+      (NC[a[0]] ? '<button type="button" data-nc="' + a[0] + '">¿Por qué?</button>' : "");
+    axl.appendChild(li);
+  });
+
+  function render() {
+    document.querySelectorAll(".pbtn").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-p") === state.p));
+    });
+    var on = state.p ? P[state.p].ax : [];
+    AX.forEach(function (a) {
+      var li = document.getElementById("ax-" + a[0]);
+      li.classList.toggle("on", on.indexOf(a[0]) >= 0);
+      li.classList.toggle("sel", state.nc === a[0]);
+    });
+    if (state.p) {
+      document.getElementById("ptitle").textContent = P[state.p].t + " (Callen)";
+      document.getElementById("ptext").innerHTML = "<p>" + P[state.p].s + "</p><p class=\"cont\">" + P[state.p].c + "</p>";
+      document.getElementById("dtext").innerHTML = P[state.p].d;
+    } else {
+      var lab = state.nc === "1c" ? "Axioma 1(c)" : "Axioma 2(c)";
+      document.getElementById("ptitle").textContent = lab;
+      document.getElementById("ptext").innerHTML = '<p class="muted">Ningún postulado de Callen le corresponde.</p>';
+      document.getElementById("dtext").innerHTML = NC[state.nc];
+    }
+  }
+
+  document.getElementById("pbtns").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".pbtn");
+    if (!b) return;
+    state.p = b.getAttribute("data-p"); state.nc = null; render();
+  });
+  axl.addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-nc]");
+    if (!b) return;
+    state.p = null; state.nc = b.getAttribute("data-nc"); render();
+    document.getElementById("pcard").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  render();
+  window.CALLEN = { AX: AX, P: P, NC: NC, state: state, render: render };
+})();
+</script>
+</body>
+</html>
