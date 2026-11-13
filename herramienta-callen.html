@@ -51,7 +51,7 @@ details table.dic { margin: 4px 0 8px; }
 <body>
 <header class="site"><div class="wrap">
 <a class="brand" href="index.html">Termodinámica<span> ·</span> notas</a>
-<nav><a href="index.html">Inicio</a><a href="index.html#clases">Clases</a><a href="index.html#herramientas">Herramientas</a><a href="parte-1.html">Resumen de la Parte I</a><a href="erratas.html">Fe de erratas</a></nav>
+<nav><a href="index.html">Inicio</a><a href="axiomas.html">Los axiomas</a><a href="index.html#clases">Clases</a><a href="index.html#herramientas">Herramientas</a><a href="parte-1.html">Resumen de la Parte I</a><a href="erratas.html">Fe de erratas</a></nav>
 </div></header>
 <main><div class="wrap">
 
@@ -115,16 +115,17 @@ details table.dic { margin: 4px 0 8px; }
 <script>
 (function () {
   "use strict";
-  // Axiomas de la Clase 23 (enunciados de una línea tomados de Clase-23.pdf).
+  // Axiomas de la Clase 23, palabra por palabra de los recuadros de Clase-23.tex (versión del 12 nov 2026).
+  // Si cambia Clase-23, actualizar esta lista y axiomas.html.
   var AX = [
     ["1a", "Axioma 1(a)", "Los estados de equilibrio de un sistema hidrostático están completamente caracterizados por su energía interna <span class=\"f\">U</span>, su volumen <span class=\"f\">V</span> y su número de moles <span class=\"f\">n</span>."],
-    ["1b", "Axioma 1(b)", "Un sistema aislado, compuesto de uno o más sistemas hidrostáticos, evoluciona hasta un único estado de equilibrio, determinado por sus cantidades conservadas y por sus restricciones internas."],
-    ["1c", "Axioma 1(c)", "La energía de un sistema aislado se conserva; para cualquier proceso, <span class=\"f\">ΔU = Q − W</span>."],
-    ["2a", "Axioma 2(a)", "Todo sistema hidrostático tiene una entropía <span class=\"f\">S(U, V, n)</span>, continua, diferenciable y estrictamente creciente en la energía: <span class=\"f\">(∂S/∂U)<sub>V,n</sub> = 1/T &gt; 0</span>."],
+    ["1b", "Axioma 1(b)", "Un sistema aislado, compuesto de uno o más sistemas hidrostáticos, evoluciona hasta un único estado de equilibrio, determinado por los valores de sus cantidades conservadas y por sus restricciones internas."],
+    ["1c", "Axioma 1(c)", "La energía de un sistema aislado se conserva. Para cualquier proceso de un sistema, <span class=\"f\">ΔU = Q − W</span>."],
+    ["2a", "Axioma 2(a)", "Todo sistema hidrostático tiene una función de estado, la entropía <span class=\"f\">S = S(U, V, n)</span>, continua y diferenciable, y estrictamente creciente en la energía: <span class=\"f\">(∂S/∂U)<sub>V,n</sub> = 1/T &gt; 0</span>."],
     ["2b", "Axioma 2(b)", "La entropía de un sistema compuesto es la suma de las entropías de sus subsistemas."],
-    ["2c", "Axioma 2(c)", "En un proceso reversible <span class=\"f\">δQ = T dS</span>, de modo que entre estados de equilibrio se cumple la relación fundamental <span class=\"f\">dS = dU/T + (p/T) dV − (μ/T) dn</span>."],
-    ["3", "Axioma 3", "Si <span class=\"f\">Θ<sub>2</sub></span> es adiabáticamente accesible desde <span class=\"f\">Θ<sub>1</sub></span>, entonces <span class=\"f\">S(Θ<sub>2</sub>) ≥ S(Θ<sub>1</sub>)</span>, con la igualdad si y sólo si <span class=\"f\">Θ<sub>1</sub></span> también es adiabáticamente accesible desde <span class=\"f\">Θ<sub>2</sub></span>."],
-    ["4", "Axioma 4", "Cerca del cero absoluto la entropía se vuelve independiente del volumen; <span class=\"f\">S<sub>0</sub></span> es el mismo para todos los estados de equilibrio con la misma composición química."],
+    ["2c", "Axioma 2(c)", "En un proceso reversible, <span class=\"f\">δQ = T dS</span>, de modo que entre estados de equilibrio se cumple la relación fundamental <span class=\"f\">dS = (1/T) dU + (p/T) dV − (μ/T) dn</span>."],
+    ["3", "Axioma 3", "Si el estado <span class=\"f\">Θ<sub>2</sub></span> es adiabáticamente accesible desde el estado <span class=\"f\">Θ<sub>1</sub></span>, entonces <span class=\"f\">S(Θ<sub>2</sub>) ≥ S(Θ<sub>1</sub>)</span>, con la igualdad si y sólo si <span class=\"f\">Θ<sub>1</sub></span> también es adiabáticamente accesible desde <span class=\"f\">Θ<sub>2</sub></span>."],
+    ["4", "Axioma 4", "Cerca del cero absoluto, la entropía se vuelve independiente del volumen: <span class=\"f\"><span class=\"u\">lim</span><sub>T→0</sub> [S(T, V<sub>2</sub>, n) − S(T, V<sub>1</sub>, n)] = 0</span>, y, más en general, <span class=\"f\">S<sub>0</sub></span> es el mismo para todos los estados de equilibrio con la misma composición química."],
     ["planck", "Convención de Planck", "Se puede tomar el enunciado de Planck y elegir <span class=\"f\">S<sub>0</sub> = 0</span> (una convención compatible con el Axioma 4)."]
   ];
   // Postulados de Callen (§1.10, parafraseados) y su correspondencia con los axiomas.
