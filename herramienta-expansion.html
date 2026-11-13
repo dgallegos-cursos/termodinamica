@@ -85,7 +85,7 @@ canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
 
 <svg id="cont" viewBox="0 0 360 132" role="img" aria-label="Recipiente con el gas y la cámara vacía"></svg>
 <div id="pview" hidden><canvas id="cv" width="720" height="240" aria-label="Animación de partículas"></canvas>
-<p class="hint" style="margin-top:6px">Ilustración (mecánica estadística): la termodinámica no la necesita. La rapidez de los puntos crece con √<i>T</i>.</p></div>
+<p class="hint" style="margin-top:6px" id="pcap">Ilustración (mecánica estadística): la termodinámica no la necesita. La rapidez de los puntos crece con √<i>T</i>.</p></div>
 
 <div class="box" aria-live="polite">
 <h3>Lo que pasa</h3>
@@ -296,9 +296,31 @@ canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
   // ---- Partículas (ilustración) ----
   var part = (function () {
     var cv = $("cv"), ctx = cv.getContext("2d"), P = [], running = false, frac = 0.5, wallOpen = false, speed = 1, lastT = 0;
+    var rad = 4, hard = false; // radio en pantalla; choques entre partículas sólo con volumen excluido (b > 0)
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var Wd = cv.width, Ht = cv.height, M = 10;
-    function seed() { P = []; for (var i = 0; i < 80; i++) { var th = Math.random() * 2 * Math.PI; P.push({ x: M + Math.random() * (frac * (Wd - 2 * M) - 4), y: M + Math.random() * (Ht - 2 * M), vx: Math.cos(th), vy: Math.sin(th) }); } }
+    function seed() {
+      P = []; var xr = Math.max(M + rad, M + frac * (Wd - 2 * M) - 4 - rad);
+      for (var i = 0; i < 80; i++) {
+        var th = Math.random() * 2 * Math.PI, x, y, k = 0, ok;
+        do { // sin traslapes cuando cabe; si no cabe, se acepta y los choques los separan
+          x = M + rad + Math.random() * (xr - M - rad); y = M + rad + Math.random() * (Ht - 2 * M - 2 * rad); ok = true;
+          if (hard) for (var j = 0; j < P.length; j++) { var dx = P[j].x - x, dy = P[j].y - y; if (dx * dx + dy * dy < 4 * rad * rad) { ok = false; break; } }
+        } while (!ok && ++k < 60);
+        P.push({ x: x, y: y, vx: Math.cos(th), vy: Math.sin(th) });
+      }
+    }
+    function collide() { // choques elásticos entre partículas iguales: se intercambian las componentes normales
+      var d2 = 4 * rad * rad;
+      for (var i = 0; i < P.length; i++) for (var j = i + 1; j < P.length; j++) {
+        var a = P[i], b = P[j], dx = b.x - a.x, dy = b.y - a.y, r2 = dx * dx + dy * dy;
+        if (r2 >= d2 || r2 === 0) continue;
+        var r = Math.sqrt(r2), nx = dx / r, ny = dy / r, ov = (2 * rad - r) / 2;
+        a.x -= nx * ov; a.y -= ny * ov; b.x += nx * ov; b.y += ny * ov;
+        var vn = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+        if (vn < 0) { a.vx += vn * nx; a.vy += vn * ny; b.vx -= vn * nx; b.vy -= vn * ny; }
+      }
+    }
     function col(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#1f4e9e"; }
     function draw() {
       ctx.clearRect(0, 0, Wd, Ht);
@@ -307,19 +329,20 @@ canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
       var xw = M + frac * (Wd - 2 * M);
       if (!wallOpen) { ctx.fillStyle = "#3b3b3b"; ctx.fillRect(xw - 3, 0, 6, Ht); }
       ctx.fillStyle = col("--blue");
-      P.forEach(function (p) { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, 2 * Math.PI); ctx.fill(); });
+      P.forEach(function (p) { ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, 2 * Math.PI); ctx.fill(); });
     }
     function step(t) {
       if (!running) return;
       var dt = Math.min(40, t - (lastT || t)); lastT = t;
-      var xw = M + frac * (Wd - 2 * M), xmax = wallOpen ? Wd - M : xw - 6;
+      var xw = M + frac * (Wd - 2 * M), xmax = wallOpen ? Wd - M - rad : Math.max(M + rad, xw - 3 - rad), lo = M + rad, hi = Ht - M - rad;
       P.forEach(function (p) {
         p.x += p.vx * speed * dt * 0.12; p.y += p.vy * speed * dt * 0.12;
-        if (p.x < M) { p.x = M; p.vx = Math.abs(p.vx); }
+        if (p.x < lo) { p.x = lo; p.vx = Math.abs(p.vx); }
         if (p.x > xmax) { p.x = xmax; p.vx = -Math.abs(p.vx); }
-        if (p.y < M) { p.y = M; p.vy = Math.abs(p.vy); }
-        if (p.y > Ht - M) { p.y = Ht - M; p.vy = -Math.abs(p.vy); }
+        if (p.y < lo) { p.y = lo; p.vy = Math.abs(p.vy); }
+        if (p.y > hi) { p.y = hi; p.vy = -Math.abs(p.vy); }
       });
+      if (hard) collide();
       draw(); requestAnimationFrame(step);
     }
     return {
@@ -328,6 +351,12 @@ canvas { display: block; width: 100%; height: auto; border-radius: 6px; }
         if (on) { draw(); if (running) { lastT = 0; requestAnimationFrame(step); } }
       },
       target: function (r) {
+        var bs = st.gas === "vdw" ? +$("s-b").value : 0; // b en unidades de 1e-5 m^3/mol
+        var nr = bs > 0 ? Math.min(11, 3 + 3.5 * Math.cbrt(bs)) : 4; // tamaño exagerado; crece como b^(1/3)
+        hard = bs > 0; if (nr !== rad) { rad = nr; if (!st.open) seed(); }
+        $("pcap").innerHTML = st.gas === "vdw"
+          ? "Ilustración (mecánica estadística): la termodinámica no la necesita. El tamaño de las partículas representa <i>b</i>; su rapidez crece con √<i>T</i>, y baja al expandirse por la atracción <i>a</i>."
+          : "Ilustración (mecánica estadística): la termodinámica no la necesita. La rapidez de los puntos crece con √<i>T</i>.";
         var f = r.V1 / r.Vf;
         if (Math.abs(f - frac) > 1e-6 || wallOpen !== st.open) { if (!st.open || !wallOpen) { frac = f; if (!st.open) seed(); } }
         wallOpen = st.open;
