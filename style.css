@@ -38,6 +38,9 @@ header.site { border-bottom: 1px solid var(--line); background: var(--surface); 
 header.site .wrap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 20px; padding-top: 14px; padding-bottom: 12px; }
 header.site .brand { font-weight: 700; font-size: 1.15rem; color: var(--ink); text-decoration: none; }
 header.site .brand span { color: var(--orange); }
+header.site .owner { font-family: var(--sans); font-size: 0.9rem; color: var(--muted); text-decoration: none; }
+header.site .owner:hover { color: var(--blue); }
+header.site .sep { color: var(--muted); margin: 0 0.4em; }
 header.site nav { display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--sans); font-size: 0.9rem; }
 header.site nav a { text-decoration: none; color: var(--muted); }
 header.site nav a:hover, header.site nav a[aria-current] { color: var(--blue); }
